@@ -36,7 +36,8 @@ class WeatherFetcher:
                 log.debug("Parsed response")
 
                 attempt = response['main'] # So we get a KeyError thrown if the response isn't correct
-            except:
+            except requests.exceptions.RequestException as e:
+                print e
                 log.exception("Error fetching weather")
             
                 # Update cache timeout to avoid repeatedly spamming requests (see https://github.com/mattdy/alarmpi/issues/2)
