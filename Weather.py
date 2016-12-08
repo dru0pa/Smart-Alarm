@@ -6,7 +6,7 @@ import logging
 import requests
 
 
-OWM_APPID = '2eb1c96ee1f6057e97bb766c8a9980ae'
+OWM_APPID = '#########'
 
 
 log = logging.getLogger('root')
