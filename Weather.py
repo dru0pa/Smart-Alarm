@@ -39,16 +39,10 @@ class WeatherFetcher:
             except requests.exceptions.RequestException as e:
                 print e
                 log.exception("Error fetching weather")
-            
-                # Update cache timeout to avoid repeatedly spamming requests (see https://github.com/mattdy/alarmpi/issues/2)
-                timeout = datetime.datetime.now(pytz.timezone('Africa/Johannesburg'))
-                timeout += datetime.timedelta(minutes=1) # Don't keep the cache for too long, just long enough to avoid request spam
-                self.cacheTimeout = timeout
-
-            if(self.cache is not None):
-                return self.cache # we have a cache, so return that rather than an empty object
-            else:
-               return weather # return empty Weather object as we have nothing else
+                if(self.cache is not None):
+                    return self.cache # we have a cache, so return that rather than an empty object
+                else:
+                    return weather # return empty Weather object as we have nothing else
     
             weather.setTempK(response['main'].get("temp", 0))
             weather.setCondition(response['weather'][0].get("description").replace("intensity ",""))
