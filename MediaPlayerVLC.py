@@ -1,5 +1,5 @@
 import time
-from mplayer import Player
+import vlc
 import Settings
 import subprocess
 import logging
@@ -9,6 +9,8 @@ log = logging.getLogger('root')
 PANIC_ALARM = 'play.mp3'
 FX_DIRECTORY = 'Sounds/'
 
+global flag
+flag = 1
 
 class MediaPlayer:
     def __init__(self):
@@ -33,32 +35,60 @@ class MediaPlayer:
             return
 
         # Fetch the number of mplayer processes running
-        processes = subprocess.Popen('ps aux | grep mplayer | egrep -v "grep" | wc -l', stdout=subprocess.PIPE, shell=True)
-
+        processes = subprocess.Popen('ps aux | grep vlc | egrep -v "grep" | wc -l',
+                                     stdout=subprocess.PIPE,
+                                     shell=True
+                                     )
         num = int(processes.stdout.read())
 
-        if num < 2 and self.player is not False:
+        if num < 1 and self.player is not False:
             log.error("Could not find mplayer instance, playing panic alarm")
             self.stopPlayer()
             time.sleep(2)
             self.playMedia(PANIC_ALARM, 0)
 
+
+
     def playStation(self, station=-1):
+
+        def end_reached(self):
+
+
+             print("End reached!")
+
         if station == -1:
             station = self.settings.getInt('station')
 
         station = Settings.STATIONS[station]
 
         log.info("Playing station %s", station['name'])
-        self.player = Player()
-        self.player.loadlist(station['url'])
-        self.player.loop = 0
+        self.i = vlc.Instance()  # Create VLC instance
+        self.p = self.i.media_player_new()  # Create new media player
+        self.event_manager = self.p.event_manager()  # Attach event to player (next 3 lines)
+        self.event = vlc.EventType()
+        self.event_manager.event_attach(self.event.MediaPlayerEndReached, end_reached)
+        self.m = self.i.media_new('http://13873.live.streamtheworld.com:443/FM947_SC')  # Create new media
+        self.p.set_media(self.m)  # Set URL as the player's media
+        self.m.release()
+        self.p.play()  # play it
+        self.p.play.loop = 0
 
     def playMedia(self, file, loop=-1):
+
+        def end_reached(self):
+            print("End reached!")
+
         log.info("Playing file %s", file)
-        self.player = Player()
-        self.player.loadfile(file)
-        self.player.loop = loop
+        self.i = vlc.Instance()  # Create VLC instance
+        self.m = self.i.media_new('PANIC_ALARM')  # Create new media
+        self.event_manager = self.p.event_manager()  # Attach event to player (next 3 lines)
+        self.event = vlc.EventType()
+        self.event_manager.event_attach(self.event.MediaPlayerEndReached, end_reached)
+        self.p.set_media(self.m)  # Set URL as the player's media
+        self.m.release()
+        self.p.play()  # play it
+        self.p.play.loop = loop
+
 
     # Play some speech. None-blocking equivalent of playSpeech, which also pays attention to sfx_enabled setting
     def playVoice(self, text):
@@ -72,15 +102,17 @@ class MediaPlayer:
 
     # Play some speech. Warning: Blocks until we're done speaking
     def playSpeech(self, text):
-        log.debug("playSpeech (blocking): {0}".format(text))
         path = self.settings.get("tts_path");
         log.info("Playing speech: '%s' through `%s`" % (text, path))
         play = subprocess.Popen('echo "%s" | %s' % (text, path), shell=True)
         play.wait()
 
     def stopPlayer(self):
-        log.debug("stopPlayer: ")
+        #if self.player:
+        #    self.player.quit()
+        #    self.player = False
+        #    log.info("Player process terminated")
         if self.player:
-            self.player.quit()
-            self.player = False
-            log.info("Player process terminated")
+             self.stopPlayer()
+             self.player = False
+             log.info("Player process terminated")

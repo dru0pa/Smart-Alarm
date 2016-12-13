@@ -99,18 +99,18 @@ class AlarmThread(threading.Thread):
             salutation = "morning" if now.strftime("%p") == "AM" else "afternoon" if int(hour) < 18 else "evening"
 
             # Today is Monday 31st of October, the time is 9 56 AM
-            speech = "Good %s Matt. Today is %s %s %s, the time is %s %s %s. " % (
+            speech = "Good %s Andrew. Today is %s %s %s, the time is %s %s %s. " % (
             salutation, now.strftime("%A"), day, now.strftime("%B"), hour, now.strftime("%M"), now.strftime("%p"))
             speech += weather
 
             self.media.playSpeech(speech)
 
         # Send a notification to HomeControl (OpenHAB) that we're now awake
-        try:
-            log.debug("Sending wake notification to HomeControl")
-            urllib2.urlopen("http://homecontrol:9090/CMD?isSleeping=OFF").read()
-        except Exception:
-            log.exception("Failed to send wake state to HomeControl")
+        #try:
+        #    log.debug("Sending wake notification to HomeControl")
+        #    urllib2.urlopen("http://homecontrol:9090/CMD?isSleeping=OFF").read()
+        #except Exception:
+        #    log.exception("Failed to send wake state to HomeControl")
 
         # Automatically set up our next alarm.
         self.autoSetAlarm()

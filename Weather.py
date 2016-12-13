@@ -4,12 +4,23 @@ import pytz
 import Settings
 import logging
 import requests
+import sys
 
 
-OWM_APPID = '#########'
+OWM_APPID = '2eb1c96ee1f6057e97bb766c8a9980ae'
 
 
 log = logging.getLogger('root')
+
+#log.setLevel(logging.DEBUG)
+
+#stream = logging.StreamHandler(sys.stdout)
+#stream.setLevel(logging.DEBUG)
+#
+#formatter = logging.Formatter('[%(asctime)s] %(levelname)8s %(module)15s: %(message)s')
+#stream.setFormatter(formatter)
+
+#log.addHandler(stream)
 
 # Fetches weather information
 class WeatherFetcher:
@@ -25,12 +36,12 @@ class WeatherFetcher:
 
             place = self.settings.get('weather_location')
             if(place is None or place is ""):
-                place = "Johannesburg, South Africa" # Default to Johannesburg" Geo coords [ 28.04006, -26.20489 ]
+                place = "Johannesburg, ZA" # Default to Johannesburg Geo cords [ 28.04006, -26.20489 ]
 
             try:
                 log.debug("Making request to OpenWeatherMap")
                 response = requests.get('http://api.openweathermap.org/data/2.5/weather?q=%s&APPID=%s' % (place, OWM_APPID), timeout=3)
-                #response = requests.get('http://api.openweathermap.org/data/2.5/forecast/city?q=%s&APPID=%s' % (place, OWM_APPID), timeout=3)
+                #response = requests.get('http://api.openweathermap.org/data/2.5/weather?id=993800&APPID=2eb1c96ee1f6057e97bb766c8a9980ae')
                 log.debug("Completed request to OpenWeatherMap")
                 response = response.json()
                 log.debug("Parsed response")
@@ -39,6 +50,7 @@ class WeatherFetcher:
             except requests.exceptions.RequestException as e:
                 print e
                 log.exception("Error fetching weather")
+            
                 if(self.cache is not None):
                     return self.cache # we have a cache, so return that rather than an empty object
                 else:
