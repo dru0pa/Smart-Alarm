@@ -26,6 +26,7 @@ class AlarmThread(threading.Thread):
         self.nextAlarm = None
         self.alarmTimeout = None
         self.snoozing = False
+        self.alarmMediaState = False
 
         self.settings = Settings.Settings()
         self.media = MediaPlayer.MediaPlayer()
@@ -40,12 +41,12 @@ class AlarmThread(threading.Thread):
 
     def stop(self):
         log.info("Stopping alarm thread")
-        if (self.media.playerActive()):
+        if self.media.playerActive:
             self.stopAlarm()
         self.stopping = True
 
     def isAlarmSounding(self):
-        return (self.media.playerActive() and self.nextAlarm is not None and self.nextAlarm < datetime.datetime.now(
+        return (self.media.playerActive and self.nextAlarm is not None and self.nextAlarm < datetime.datetime.now(
             pytz.timezone('Africa/Johannesburg')))
 
     def isSnoozing(self):
@@ -69,6 +70,7 @@ class AlarmThread(threading.Thread):
     def soundAlarm(self):
         log.info("Alarm triggered")
         self.media.soundAlarm(self)
+        self.alarmMediaState = True
         timeout = datetime.datetime.now(pytz.timezone('Africa/Johannesburg'))
         timeout += datetime.timedelta(minutes=self.settings.getInt('alarm_timeout'))
         self.alarmTimeout = timeout
@@ -77,6 +79,7 @@ class AlarmThread(threading.Thread):
     def stopAlarm(self):
         log.info("Stopping alarm")
         self.silenceAlarm()
+        self.alarmMediaState = False
 
         self.clearAlarm()
 
@@ -100,19 +103,11 @@ class AlarmThread(threading.Thread):
 
             # Today is Monday 31st of October, the time is 9 56 AM
             speech = "Good %s Andrew. Today is %s %s %s, the time is %s %s %s. " % (
-            salutation, now.strftime("%A"), day, now.strftime("%B"), hour, now.strftime("%M"), now.strftime("%p"))
+                salutation, now.strftime("%A"), day, now.strftime("%B"), hour, now.strftime("%M"), now.strftime("%p"))
             speech += weather
 
             self.media.playSpeech(speech)
 
-        # Send a notification to HomeControl (OpenHAB) that we're now awake
-        #try:
-        #    log.debug("Sending wake notification to HomeControl")
-        #    urllib2.urlopen("http://homecontrol:9090/CMD?isSleeping=OFF").read()
-        #except Exception:
-        #    log.exception("Failed to send wake state to HomeControl")
-
-        # Automatically set up our next alarm.
         self.autoSetAlarm()
 
     # Stop whatever is playing
@@ -152,7 +147,7 @@ class AlarmThread(threading.Thread):
             # Read out the time we've just set
             hour = event.strftime("%I").lstrip("0")
             readTime = "%s %s %s" % (hour, event.strftime("%M"), event.strftime("%p"))
-            self.media.playVoice('Automatic alarm has been set for %s' % (readTime))
+            self.media.playVoice('Automatic alarm has been set for %s' % readTime)
 
         except Exception as e:
             log.exception("Could not automatically set alarm")
@@ -162,7 +157,7 @@ class AlarmThread(threading.Thread):
     # Find out where our next event is, and then calculate travel time to there
     def fetchTravelTime(self, update=False):
         destination = self.alarmGatherer.getNextEventLocation(includeToday=update)
-        if (destination is None):
+        if destination is None:
             destination = self.settings.get('location_work')
         travelTime = self.travel.getTravelTime(destination)
 
@@ -242,19 +237,20 @@ class AlarmThread(threading.Thread):
         return message
 
     def run(self):
-        while (not self.stopping):
+        log.debug("starting alarm thread loop")
+        while not self.stopping:
             now = datetime.datetime.now(pytz.timezone('Africa/Johannesburg'))
 
-            if (
-                            self.nextAlarm is not None and self.fromEvent and self.alarmInSeconds() < 3600 and not self.travelCalculated):
-                # We're inside 1hr of an event alarm being triggered, and we've not taken into account the current traffic situation
+            if self.nextAlarm is not None and self.fromEvent and self.alarmInSeconds() < 3600 and not self.travelCalculated:
+                #  We're inside 1hr of an event alarm being triggered, and we've not taken into account the current traffic situation
                 self.travelAdjustAlarm()
 
-            if (self.nextAlarm is not None and self.nextAlarm < now and not self.media.playerActive()):
+            if self.nextAlarm is not None and self.nextAlarm < now and not self.alarmMediaState:
                 self.soundAlarm()
 
-            if (self.alarmTimeout is not None and self.alarmTimeout < now):
+            if self.alarmTimeout is not None and self.alarmTimeout < now:
                 log.info("Alarm timeout reached, stopping alarm")
                 self.stopAlarm()
 
             time.sleep(1)
+        log.debug("ending alarm thread loop")

@@ -7,7 +7,7 @@ import requests
 import sys
 
 
-OWM_APPID = '******'
+OWM_APPID = '2eb1c96ee1f6057e97bb766c8a9980ae'
 
 
 log = logging.getLogger('root')
@@ -40,8 +40,8 @@ class WeatherFetcher:
 
             try:
                 log.debug("Making request to OpenWeatherMap")
-                #response = requests.get('http://api.openweathermap.org/data/2.5/weather?q=%s&APPID=%s' % (place, OWM_APPID), timeout=3)
-                response = requests.get('http://api.openweathermap.org/data/2.5/weather?id=*****')
+                response = requests.get('http://api.openweathermap.org/data/2.5/weather?q=%s&APPID=%s' % (place, OWM_APPID), timeout=3)
+                #response = requests.get('http://api.openweathermap.org/data/2.5/weather?id=993800&APPID=2eb1c96ee1f6057e97bb766c8a9980ae')
                 log.debug("Completed request to OpenWeatherMap")
                 response = response.json()
                 log.debug("Parsed response")

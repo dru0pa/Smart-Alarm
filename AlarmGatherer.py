@@ -11,10 +11,8 @@ from oauth2client import client
 import datetime
 import logging
 from googleapiclient.discovery import build
-from apiclient import discovery
 from oauth2client.file import Storage
 import Settings
-
 import os
 
 try:
@@ -33,6 +31,9 @@ APPLICATION_NAME = 'Smart-Alarm'
 class AlarmGatherer:
 
     def __init__(self):
+        self.settings = Settings.Settings()
+
+#    def __init__(self):
         #home_dir = os.path.expanduser('~')
         #credential_dir = os.path.join(home_dir, 'calendar.dat')
         #if not os.path.exists(credential_dir):
@@ -76,7 +77,7 @@ class AlarmGatherer:
         if not today:
             # We want to find events tomorrow, rather than another one today
             log.debug("Skipping events from today")
-            #time += datetime.timedelta(days=1)  # Move to tomorrow
+            # time += datetime.timedelta(days=1)  # Move to tomorrow
             time = time.replace(hour=10, minute=0, second=0, microsecond=0)  # Reset to 10am the next day
             # 10am is late enough that a night shift from today won't be caught, but a morning shift
             #  from tomorrow will be caught
@@ -96,7 +97,7 @@ class AlarmGatherer:
         log.debug("Fetching next event time (including today=%s)" % (includeToday))
         nextEvent = self.getNextEvent(today=includeToday)
         start = dateutil.parser.parse(nextEvent['start']['dateTime'])
-        # start = dateutil.parser.parse(nextEvent['start']['dateTime'],ignoretz=True)
+        # start = dateutil.parser.parse(nextEvent['start']['dateTime'], ignoretz=True)
         # start = start.replace(tzinfo=pytz.timezone('Africa/Johannesburg'))
 
         return start
@@ -109,9 +110,10 @@ class AlarmGatherer:
         return None
 
     def getDefaultAlarmTime(self):
-        defaultTime = ('0600')
-        #defaultTime = self.settings.getint('default_wake')
-        #defaultTime = self.settings.getint('default_wake')
+        defaultTime = ('0700')
+        #defaultTime = self.settings.getInt('default_wake')
+        # defaultTime = self.settings.get('default_wake')
+        # defaultTime = self.settings.getint('default_wake')
         defaultHour = int(defaultTime[:2])
         defaultMin = int(defaultTime[2:])
 
@@ -134,3 +136,4 @@ if __name__ == '__main__':
 
     print(a.getNextEventTime())
     print(a.getNextEventLocation())
+

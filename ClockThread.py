@@ -4,22 +4,21 @@ import time
 import datetime
 import pytz
 import threading
-from Adafruit_LED_Backpack import SevenSegment
+from Adafruit_7Segment import SevenSegment
 
 
 class ClockThread(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
-        self.segment = SevenSegment.SevenSegment(address=0x70)
-        self.stopping=False
+        self.segment = SevenSegment(address=0x70)
+        self.stopping = False
 
     def stop(self):
-        self.segment.clear()
-        #self.segment.disp.clear()
-        self.stopping=True
+        self.segment.disp.clear()
+        self.stopping = True
 
     def run(self):
-        while(not self.stopping):
+        while not self.stopping:
             now = datetime.datetime.now(pytz.timezone('Africa/Johannesburg'))
             hour = now.hour
 
@@ -32,6 +31,8 @@ class ClockThread(threading.Thread):
             # Set minutes
             self.segment.writeDigit(3, int(minute / 10))   # Tens
             self.segment.writeDigit(4, minute % 10)        # Ones
+            # Toggle colon
+            # self.segment.set_colon(second % 2)
+
 
             time.sleep(1)
-

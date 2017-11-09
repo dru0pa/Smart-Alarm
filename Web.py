@@ -38,7 +38,7 @@ class index:
                          form.regexp('[0-2][0-9][0-5][0-9]', 'Must be a 24hr time'),
                          description="Set alarm time",
                          value=alarmTime,
-                         ),
+            ),
         )
 
     def GET(self):
@@ -70,7 +70,6 @@ class index:
 class reset:
     def GET(self):
         global alarm
-
         log.debug("Web request to reset alarm")
         alarm.autoSetAlarm()
 
@@ -89,60 +88,60 @@ class set:
                          form.notnull,
                          description="Home location",
                          value=settings.get('location_home'),
-                         ),
+            ),
             form.Textbox("work",
                          form.notnull,
                          description="Work location",
                          value=settings.get('location_work'),
-                         ),
+            ),
             form.Textbox("weatherloc",
                          form.notnull,
                          description="Weather location",
                          value=settings.get('weather_location'),
-                         ),
+            ),
             form.Textbox("snooze",
                          form.notnull,
                          form.regexp('\d+', 'Must be a digit'),
                          description="Snooze Length (minutes)",
                          value=settings.getInt('snooze_length'),
-                         ),
+            ),
             form.Textbox("wakeup",
                          form.notnull,
                          form.regexp('\d+', 'Must be a digit'),
                          description="Time (mins) before event for alarm",
                          value=settings.getInt('wakeup_time'),
-                         ),
+            ),
             form.Textbox("precancel",
                          form.notnull,
                          form.regexp('\d+', 'Must be a digit'),
                          description="Pre-empt cancel alarm allowed (secs)",
                          value=settings.get('preempt_cancel'),
-                         ),
+            ),
             form.Textbox("waketime",
                          form.notnull,
                          form.regexp('[0-2][0-9][0-5][0-9]', 'Must be a 24hr time'),
                          description="Default wakeup time",
                          value=settings.get('default_wake'),
-                         ),
+            ),
             form.Checkbox("holidaymode",
                           description="Holiday mode enabled",
                           checked=(settings.getInt('holiday_mode') == 1),
                           value="holiday",
-                          ),
+            ),
             form.Checkbox("weatheronalarm",
                           description="Play weather after alarm",
                           checked=(settings.getInt('weather_on_alarm') == 1),
                           value="weatheronalarm",
-                          ),
+            ),
             form.Checkbox("sfx",
                           description="SFX enabled",
                           checked=(settings.getInt('sfx_enabled') == 1),
                           value="sfx",
-                          ),
+            ),
             form.Textbox("ttspath",
                          description="TTS path",
                          value=settings.get('tts_path'),
-                         ),
+            ),
         )
 
     def GET(self):
@@ -232,7 +231,7 @@ class WebApplication(threading.Thread):
         log.debug("Starting up web server")
         self.app = web.application(urls, globals())
         self.app.internalerror = web.debugerror
-        web.httpserver.runsimple(self.app.wsgifunc(), ("192.168.182.136", 8080))
+        web.httpserver.runsimple(self.app.wsgifunc(), ("192.168.1.254", 80))
         log.debug("Web server has stopped")
 
     def stop(self):

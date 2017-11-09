@@ -6,7 +6,8 @@ log = logging.getLogger('root')
 
 # Radio stations we can play through mplayer
 STATIONS = [
-    {'name': '947', 'url': 'http://13873.live.streamtheworld.com:443/FM947_SC'},
+    {'name': '702', 'url': 'http://17873.live.streamtheworld.com:3690/FM702_SC'},
+    {'name': '947', 'url': 'http://playerservices.streamtheworld.com/pls/FM947.pls'},
     {'name': 'BBC Radio 1', 'url': 'http://www.radiofeeds.co.uk/bbcradio1.pls'},
     {'name': 'BBC Radio 2', 'url': 'http://www.radiofeeds.co.uk/bbcradio2.pls'},
     {'name': 'Capital FM', 'url': 'http://ms1.capitalinteractive.co.uk/fm_high'},
@@ -41,7 +42,7 @@ class Settings:
         ('manual_alarm', ''),  # Manual alarm time (default not set)
         ('holiday_mode', '0'),  # Is holiday mode (no auto-alarm setting) enabled?
         ('sfx_enabled', '1'),  # Are sound effects enabled?
-        ('default_wake', '0930'),  # If our alarm gets scheduled for later than this, ignore and default to this
+        ('default_wake', '0800'),  # If our alarm gets scheduled for later than this, ignore and default to this
         ('alarm_timeout', '120'),  # If the alarm is still going off after this many minutes, stop it
         ('weather_location', 'Johannesburg, ZA'),  # The location to load weather for
         ('weather_on_alarm', '1'),  # Read out the weather on alarm cancel
@@ -109,3 +110,4 @@ if __name__ == '__main__':
     settings = Settings()
     for s in settings.DEFAULTS:
         print("%s = %s" % (s[0], settings.get(s[0])))
+
