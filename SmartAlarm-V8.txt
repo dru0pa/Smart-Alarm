@@ -1,12 +1,10 @@
-Smart Alarm V8
+Smart Alarm Clock Install preperation
 
 
 sudo apt-get update
 sudo apt-get dist-upgrade -y
 
-sudo apt-get install vim mlocate subversion htop -y
-
-sudo apt-get install python-dev python-pip -y
+sudo apt-get install vim mlocate subversion htop python-dev festival mplayer python-pip -y
 
 sudo vim /boot/config.txt
 
@@ -30,17 +28,11 @@ sudo pip install python-gflags
 sudo pip install web.py
 sudo pip install lpthw.web
 
-sudo apt-get install festival mplayer -y
+sudo vim /etc/festival.scm
+(set! voice_default voice_don_diphone)
 
 pip freeze --local | grep -v '^\-e' | cut -d = -f 1  | xargs -n1 pip install -U
 
-
-mkdir Python-files
-cd Python-files/
-git clone https://github.com/baudm/mplayer.py.git
-sudo mv mplayer.py /
-cd /Smart-Alarm-V8/
-sudo ln -s ../mplayer.py/mplayer/
 
 sudo vim /usr/local/bin/vol
 #!/bin/bash
