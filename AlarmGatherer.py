@@ -1,7 +1,3 @@
-# client ID
-# 220162263656-nmkev89i1gl9ivklc7jvbum81s77kgu2.apps.googleusercontent.com
-# client secret
-# rCa06XbvbQlgzaGDhcaX6E-L
 from __future__ import print_function
 import pytz
 import dateutil.parser
